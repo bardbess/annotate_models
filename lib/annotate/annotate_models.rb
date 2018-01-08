@@ -247,7 +247,10 @@ module AnnotateModels
       cols = cols.sort_by(&:name) if options[:sort]
       cols = classified_sort(cols) if options[:classified_sort]
       cols.each do |col|
-        col_type = get_col_type(col)
+        col_type, _ = klass.attributes_to_define_after_schema_loads[col.name]
+        col_type = col_type.to_s if col_type
+        col_type ||= get_col_type(col)
+
         attrs = []
         attrs << "default(#{schema_default(klass, col)})" unless col.default.nil? || hide_default?(col_type, options)
         attrs << 'unsigned' if col.respond_to?(:unsigned?) && col.unsigned?
